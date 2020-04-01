@@ -5,10 +5,13 @@
  */
 package co.edu.utp.isc.gia.restuser.service.impl;
 
+import co.edu.utp.isc.gia.restuser.data.entity.User;
+import co.edu.utp.isc.gia.restuser.data.repository.UserRepository;
 import co.edu.utp.isc.gia.restuser.service.UserService;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.ArrayList;
 import java.util.List;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,13 +22,20 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     
     private List<UserDTO> users = new ArrayList<>();
-   
+    
+    private UserRepository userRepository;
+    
+    private ModelMapper mapper;
+
+    public UserServiceImpl(UserRepository userRepository, ModelMapper mapper) {
+        this.userRepository = userRepository;
+        this.mapper = mapper;
+    }
+     
     @Override
     public UserDTO save(UserDTO user) {
-        user.setId(users.size() + 1L);
-        user.setUsername(user.getUsername().toLowerCase());
-        users.add(user);
-        return user;
+        User u = this.userRepository.save(mapper.map(user, User.class));      
+        return mapper.map(u, UserDTO.class);
     }
 
     @Override
