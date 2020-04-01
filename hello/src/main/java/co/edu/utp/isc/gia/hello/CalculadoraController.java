@@ -25,18 +25,20 @@ public class CalculadoraController {
     }
 
     
-    
+    //localhost:8080/calc/resta?num1=10&num2=5.5
     @GetMapping("/resta")
     public Double resta(@RequestParam("num1") double num1, @RequestParam("num2") double num2) {
         return num1 - num2;
     }
        
     
+    //localhost:8080/calc/multiplicacion?num1=8&num2=10
     @GetMapping("/multiplicacion")
     public Double multiplicacion(@RequestParam("num1") double num1, @RequestParam("num2") double num2) {
         return num1 * num2;
     }
-
+    
+    //localhost:8080/calc/division?num1=5.5&num2=5.5
     @GetMapping("/division")
     public Double division(@RequestParam("num1") double num1, @RequestParam("num2") double num2) {
         if (num2 == 0.0) {
