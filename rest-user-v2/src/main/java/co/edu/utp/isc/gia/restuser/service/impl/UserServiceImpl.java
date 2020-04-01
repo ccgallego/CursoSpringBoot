@@ -6,7 +6,6 @@
 package co.edu.utp.isc.gia.restuser.service.impl;
 
 import co.edu.utp.isc.gia.restuser.service.UserService;
-import co.edu.utp.isc.gia.restuser.service.UserService;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.ArrayList;
 import java.util.List;
