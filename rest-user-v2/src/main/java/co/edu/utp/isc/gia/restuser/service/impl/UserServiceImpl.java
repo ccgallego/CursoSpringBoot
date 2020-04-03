@@ -5,7 +5,7 @@
  */
 package co.edu.utp.isc.gia.restuser.service.impl;
 
-import co.edu.utp.isc.gia.restuser.data.entity.User;
+import co.edu.utp.isc.gia.restuser.data.entity.UserEntity;
 import co.edu.utp.isc.gia.restuser.data.repository.UserRepository;
 import co.edu.utp.isc.gia.restuser.service.UserService;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private List<UserDTO> users = new ArrayList<>();
-
     private UserRepository userRepository;
 
     private ModelMapper mapper;
@@ -34,29 +32,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO save(UserDTO user) {
+    public UserDTO save(UserDTO user) throws Exception {
+        if (user == null) {
+            throw new Exception("Parametros no válidos");
+        } else if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            throw new Exception("Parametro username requerido");
+        } else if (user.getName() == null || user.getName().isEmpty()) {
+            throw new Exception("Parametro name requerido");
+        } else if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new Exception("Parametro password requerido");
+        } else if (user.getEmail()== null || user.getEmail().isEmpty()){
+            throw new Exception("Parametro email requerido");
+        } 
+        
         user.setUsername(user.getUsername().toLowerCase());
-        User u = this.userRepository.save(mapper.map(user, User.class));
+        UserEntity u = this.userRepository.save(mapper.map(user, UserEntity.class));
         return mapper.map(u, UserDTO.class);
     }
-    
+
     @Override
     public List<UserDTO> findAll() {
-        Iterable<User> u = this.userRepository.findAll();
+        Iterable<UserEntity> u = this.userRepository.findAll();
         List<UserDTO> listaUsuarios = new ArrayList<>();
-        if(u != null){
-            for (User user : u ) {
+        if (u != null) {
+            for (UserEntity user : u) {
                 listaUsuarios.add(mapper.map(user, UserDTO.class));
             }
             return listaUsuarios;
         }
-        return null;   
+        return null;
     }
 
     @Override
     public UserDTO findOne(Long id) {
-        Optional<User> opUser = this.userRepository.findById(id);
-        if(opUser.isPresent()){
+        Optional<UserEntity> opUser = this.userRepository.findById(id);
+        if (opUser.isPresent()) {
             return mapper.map(opUser.get(), UserDTO.class);
         }
         return null;
@@ -64,8 +74,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO delete(Long id) {
-        Optional<User> opUser = this.userRepository.findById(id);
-        if(opUser.isPresent()){
+        Optional<UserEntity> opUser = this.userRepository.findById(id);
+        if (opUser.isPresent()) {
             this.userRepository.deleteById(id);
             return mapper.map(opUser.get(), UserDTO.class);
         }

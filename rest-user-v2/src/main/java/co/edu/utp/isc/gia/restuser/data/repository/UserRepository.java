@@ -5,13 +5,13 @@
  */
 package co.edu.utp.isc.gia.restuser.data.repository;
 
-import co.edu.utp.isc.gia.restuser.data.entity.User;
+import co.edu.utp.isc.gia.restuser.data.entity.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 
 /**
  *
  * @author utp
  */
-public interface UserRepository extends CrudRepository<User, Long>{
+public interface UserRepository extends CrudRepository<UserEntity, Long>{
     
 }
