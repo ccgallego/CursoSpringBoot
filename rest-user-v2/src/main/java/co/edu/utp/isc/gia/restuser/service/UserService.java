@@ -15,8 +15,8 @@ import java.util.List;
 public interface UserService {
     
     UserDTO save(UserDTO user) throws Exception;
-    List<UserDTO> findAll();
-    UserDTO findOne(Long id);
+    List<UserDTO> findAll() throws Exception;
+    UserDTO findOne(Long id) throws Exception;
     UserDTO delete(Long id);
     
 }

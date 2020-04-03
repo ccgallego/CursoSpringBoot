@@ -70,7 +70,7 @@ public class UserServiceTest {
     }
     
     @Test()
-    public void saveUsernameEmpty() throws Exception{
+    public void testSaveUsernameEmpty() throws Exception{
         userDto = new UserDTO(null, null, "1223", "Cristian Gallego", "cgallego@gmail.com");
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
@@ -83,7 +83,7 @@ public class UserServiceTest {
     }
     
     @Test()
-    public void savePasswordEmpty() throws Exception{
+    public void testSavePasswordEmpty() throws Exception{
         userDto = new UserDTO(null, "cgallego", null, "Cristian Gallego", "cgallego@gmail.com");
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
@@ -96,7 +96,7 @@ public class UserServiceTest {
     }
     
     @Test()
-    public void saveNameEmpty() throws Exception{
+    public void testSaveNameEmpty() throws Exception{
         userDto = new UserDTO(null, "cgallego", "1223", null, "cgallego@gmail.com");
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
@@ -109,7 +109,7 @@ public class UserServiceTest {
     }
     
     @Test()
-    public void saveEmailEmpty() throws Exception{
+    public void testSaveEmailEmpty() throws Exception{
         userDto = new UserDTO(null, "cgallego", "1223", "Cristian Gallego", null);
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
