@@ -9,6 +9,9 @@ import co.edu.utp.isc.gia.restuser.data.entity.UserEntity;
 import co.edu.utp.isc.gia.restuser.data.repository.UserRepository;
 import co.edu.utp.isc.gia.restuser.service.impl.UserServiceImpl;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,22 +124,77 @@ public class UserServiceTest {
         assertTrue(eThrows.getMessage().contains("Parametro email requerido"));
     }
     
-    
-    
-    
-    
-    /*@Test
-    public void saveUserNull() throws Exception{
-        userEntity = new UserEntity(null, null, null, null,null);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+    @Test
+    public void testFindAllUsers(){
+        List<UserEntity> usuarios = new ArrayList<>();
+        usuarios.add(new UserEntity(1L, "cgallego", "123", "Cristian Gallego", "cgallego202@gmail.com"));
+        when(userRepository.findAll()).thenReturn(usuarios);
         
-        userDto = new UserDTO(null, null, null, null,null);
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
-        UserDTO expect = new UserDTO(null, null, null, null,null);
         
-        UserDTO result = instance.save(userDto);
+        List<UserDTO> expected = new ArrayList<>();
+        expected.add(new UserDTO(1L, "cgallego", "123", "Cristian Gallego", "cgallego202@gmail.com"));
+        
+        List<UserDTO> result = instance.findAll();
+        
+        assertEquals(expected.get(0), result.get(0));         
+    }
+    
+    @Test
+    public void testFindUsersNull(){    
+        List<UserEntity> usuarios = new ArrayList();
+        when(userRepository.findAll()).thenReturn(usuarios);
+        
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+        
+        //List<UserDTO> expected = new ArrayList<>();
+        
+        List<UserDTO> result = instance.findAll();
+        
+        assertTrue(result.isEmpty());
+    }
+    
+    
+    @Test
+    public void testFindOneOk() throws Exception{    
+        userEntity = new UserEntity(1L, "cgallego", "123", "Cristian Gallego", "cgallego202@gmail.com");
+    
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
+        
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+        
+        UserDTO expect = new UserDTO(1L, "cgallego", "123", "Cristian Gallego", "cgallego202@gmail.com");
+        
+        UserDTO result = instance.findOne(1L);
         
         assertEquals(expect, result);
-    }*/
+       
+    }
+    
+    @Test
+    public void testFindOneIdNull() throws Exception{       
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+        
+        Exception eThrows = assertThrows(Exception.class, () -> {
+            UserDTO result = instance.findOne(null);
+        });
+        
+        assertTrue(eThrows.getMessage().contains("El id es necesario para consultar"));     
+    }
+    
+    @Test
+    public void testFindOneIsEmpty() throws Exception{       
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+      
+        when(userRepository.findById(8L)).thenReturn(Optional.empty());
+        
+        Exception eThrows = assertThrows(Exception.class, () -> {
+            UserDTO result = instance.findOne(8L);
+        });
+        
+        assertTrue(eThrows.getMessage().contains("El usuario no existe"));     
+    }
+    
+    
     
 }

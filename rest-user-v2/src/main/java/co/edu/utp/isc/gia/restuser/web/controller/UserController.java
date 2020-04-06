@@ -5,9 +5,10 @@
  */
 package co.edu.utp.isc.gia.restuser.web.controller;
 
+import co.edu.utp.isc.gia.restuser.exceptions.ExResponseEntityExceptionHandler;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.InternalServerErrorException;
-import co.edu.utp.isc.gia.restuser.exceptions.responses.OkSuccess;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.NoContentException;
 import co.edu.utp.isc.gia.restuser.service.impl.UserServiceImpl;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.List;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("user")
-public class UserController{
+public class UserController extends ExResponseEntityExceptionHandler {
 
     private UserServiceImpl userService;
 
@@ -47,19 +48,19 @@ public class UserController{
         try {
             u = this.userService.save(user);
         } catch (Exception e) {
-            throw new InternalServerErrorException(e.getMessage());
+            throw new InternalServerErrorException("Error guardando al usuario, verificar los datos ingresados");
         }
         
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }
 
     @GetMapping()
-    public ResponseEntity<List<UserDTO>> getAll() throws Exception {
+    public ResponseEntity<?> getAll() throws Exception {
         List<UserDTO> list = userService.findAll();
         if (!list.isEmpty()) {
-            return ResponseEntity.ok(list);
+            return ResponseEntity.status(HttpStatus.OK).body(list);
         }
-        return ResponseEntity.noContent().build();
+        throw new NoContentException("No hay datos disponibles");
     }
 
     @GetMapping("/{id}")

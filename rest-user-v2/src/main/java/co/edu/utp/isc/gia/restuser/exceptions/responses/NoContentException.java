@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author utp
  */
 @ResponseStatus(HttpStatus.NO_CONTENT)
-public class NotContentException extends RuntimeException{
-    public NotContentException(String exception) {
+public class NoContentException extends RuntimeException{
+    public NoContentException(String exception) {
 		super(exception);
 	}
     

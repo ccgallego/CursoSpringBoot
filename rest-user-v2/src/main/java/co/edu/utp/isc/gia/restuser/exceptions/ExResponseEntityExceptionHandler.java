@@ -8,7 +8,7 @@ package co.edu.utp.isc.gia.restuser.exceptions;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.FoundException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.InternalServerErrorException;
-import co.edu.utp.isc.gia.restuser.exceptions.responses.NotContentException;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.NoContentException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.NotFoundException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.OkSuccess;
 import java.util.Date;
@@ -35,8 +35,8 @@ public class ExResponseEntityExceptionHandler extends ResponseEntityExceptionHan
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(NotContentException.class)
-    public final ResponseEntity<ResponseException> handleNoContentException(NotContentException ex, WebRequest request) {
+    @ExceptionHandler(NoContentException.class)
+    public final ResponseEntity<ResponseException> handleNoContentException(NoContentException ex, WebRequest request) {
         ResponseException exceptionResponse = new ResponseException(new Date(), ex.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NO_CONTENT);
@@ -63,7 +63,7 @@ public class ExResponseEntityExceptionHandler extends ResponseEntityExceptionHan
         return new ResponseEntity<>(exceptionResponse, HttpStatus.OK);
     }
     
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler(InternalServerErrorException.class)
     public final ResponseEntity<ResponseException> handleInternalServerErrorException(InternalServerErrorException ex, WebRequest request) {
         ResponseException exceptionResponse = new ResponseException(new Date(), ex.getMessage(),
                 request.getDescription(false));

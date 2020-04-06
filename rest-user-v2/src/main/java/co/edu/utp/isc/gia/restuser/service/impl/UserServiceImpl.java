@@ -51,16 +51,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> findAll() throws Exception {
-        Iterable<UserEntity> u = this.userRepository.findAll();
+    public List<UserDTO> findAll(){
         List<UserDTO> listaUsuarios = new ArrayList<>();
-        if (u != null) {
+        Iterable<UserEntity> u = this.userRepository.findAll();
+        int size = 0;
+        for(UserEntity v: u){
+            size++;
+        } 
+        if (size != 0) {
             for (UserEntity user : u) {
                 listaUsuarios.add(mapper.map(user, UserDTO.class));
             }
             return listaUsuarios;
         }
-        throw new Exception("No hay datos disponibles");
+        return listaUsuarios;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class UserServiceImpl implements UserService {
         if (opUser.isPresent()) {
             return mapper.map(opUser.get(), UserDTO.class);
         }
-        return null;
+        throw new Exception("El usuario no existe");
     }
 
     @Override
