@@ -9,6 +9,7 @@ import co.edu.utp.isc.gia.restuser.exceptions.ExResponseEntityExceptionHandler;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.InternalServerErrorException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.NoContentException;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.NotFoundException;
 import co.edu.utp.isc.gia.restuser.service.impl.UserServiceImpl;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -54,7 +56,7 @@ public class UserController extends ExResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }
 
-    @GetMapping()
+    @GetMapping() //localhost:8080/user/
     public ResponseEntity<?> getAll() throws Exception {
         List<UserDTO> list = userService.findAll();
         if (!list.isEmpty()) {
@@ -63,22 +65,35 @@ public class UserController extends ExResponseEntityExceptionHandler {
         throw new NoContentException("No hay datos disponibles");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getOne(@PathVariable("id") Long id) throws Exception {
-        UserDTO user = userService.findOne(id);
-        if (user != null) {
-            return ResponseEntity.ok(user);
+    @GetMapping("/getOne") //localhost:8080/user/getOne?id=8
+    public ResponseEntity<UserDTO> getOne(@RequestParam("id") Long id) {
+        if(id == null){
+            throw new BadRequestException(("Debe ingresar el id del usuario a buscar"));
         }
-        return ResponseEntity.notFound().build();
+        UserDTO user;
+        try {
+            user = userService.findOne(id);
+        } catch (Exception e) {
+            throw new NotFoundException("No se encontraron resultados");
+        }
+        
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+       
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<UserDTO> deleteUser(@PathVariable("id") Long id) {
-        UserDTO user = userService.delete(id);
-        if (user != null) {
-            return ResponseEntity.ok(user);
+        if(id == null){
+            throw new BadRequestException("Debe ingresar el id del usuario a eliminar");
         }
-        return ResponseEntity.noContent().build();
+        UserDTO user;
+        try {
+            user = userService.delete(id);
+        } catch (Exception e) {
+            throw new NoContentException("Error eliminando al usuario");
+        }
+        
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     /*@PutMapping("/{id}")

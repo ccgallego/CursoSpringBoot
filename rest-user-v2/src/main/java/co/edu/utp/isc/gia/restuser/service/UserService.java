@@ -17,6 +17,6 @@ public interface UserService {
     UserDTO save(UserDTO user) throws Exception;
     List<UserDTO> findAll() throws Exception;
     UserDTO findOne(Long id) throws Exception;
-    UserDTO delete(Long id);
+    UserDTO delete(Long id) throws Exception;;
     
 }

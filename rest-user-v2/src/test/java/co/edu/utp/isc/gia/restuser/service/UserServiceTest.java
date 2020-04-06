@@ -137,7 +137,11 @@ public class UserServiceTest {
         
         List<UserDTO> result = instance.findAll();
         
-        assertEquals(expected.get(0), result.get(0));         
+        assertEquals(expected.get(0).getId(), result.get(0).getId());         
+        assertEquals(expected.get(0).getUsername(), result.get(0).getUsername());         
+        assertEquals(expected.get(0).getPassword(), result.get(0).getPassword());         
+        assertEquals(expected.get(0).getName(), result.get(0).getName());         
+        assertEquals(expected.get(0).getEmail(), result.get(0).getEmail());         
     }
     
     @Test
@@ -183,17 +187,29 @@ public class UserServiceTest {
     }
     
     @Test
-    public void testFindOneIsEmpty() throws Exception{       
+    public void testFindOneIsEmpty() throws Exception {       
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+        userEntity = new UserEntity();
       
-        when(userRepository.findById(8L)).thenReturn(Optional.empty());
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(userEntity));
         
-        Exception eThrows = assertThrows(Exception.class, () -> {
-            UserDTO result = instance.findOne(8L);
-        });
+        UserDTO expected = new UserDTO();
         
-        assertTrue(eThrows.getMessage().contains("El usuario no existe"));     
+        UserDTO result = instance.findOne(39L);
+        
+        assertEquals(expected, result);
     }
+    
+    
+    /*public void testDeleteOk(){
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+        userEntity = new UserEntity(1L, "cgallego", "123", "Cristian Gallego", "cgallego202");
+        
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(userEntity));
+        
+        
+        
+    }*/
     
     
     

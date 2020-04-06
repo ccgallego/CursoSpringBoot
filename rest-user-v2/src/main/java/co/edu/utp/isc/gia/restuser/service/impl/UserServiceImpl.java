@@ -54,11 +54,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> findAll(){
         List<UserDTO> listaUsuarios = new ArrayList<>();
         Iterable<UserEntity> u = this.userRepository.findAll();
-        int size = 0;
-        for(UserEntity v: u){
-            size++;
-        } 
-        if (size != 0) {
+        while (u.iterator().hasNext()) {
             for (UserEntity user : u) {
                 listaUsuarios.add(mapper.map(user, UserDTO.class));
             }
@@ -75,18 +71,23 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> opUser = this.userRepository.findById(id);
         if (opUser.isPresent()) {
             return mapper.map(opUser.get(), UserDTO.class);
+        } else {
+            return mapper.map(opUser.get(), UserDTO.class);
         }
-        throw new Exception("El usuario no existe");
+        
     }
 
     @Override
-    public UserDTO delete(Long id) {
+    public UserDTO delete(Long id) throws Exception {
+        if(id == null){
+            throw new Exception("El id es necesario para consultar");
+        }
         Optional<UserEntity> opUser = this.userRepository.findById(id);
         if (opUser.isPresent()) {
             this.userRepository.deleteById(id);
             return mapper.map(opUser.get(), UserDTO.class);
         }
-        return null;
+        return mapper.map(opUser.get(), UserDTO.class);
     }
 
 }
