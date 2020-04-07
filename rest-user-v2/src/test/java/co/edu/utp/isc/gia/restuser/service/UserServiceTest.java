@@ -7,6 +7,9 @@ package co.edu.utp.isc.gia.restuser.service;
 
 import co.edu.utp.isc.gia.restuser.data.entity.UserEntity;
 import co.edu.utp.isc.gia.restuser.data.repository.UserRepository;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.InternalServerErrorException;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.NotFoundException;
 import co.edu.utp.isc.gia.restuser.service.impl.UserServiceImpl;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import org.modelmapper.ModelMapper;
 
@@ -73,12 +77,25 @@ public class UserServiceTest {
     }
     
     @Test()
+    public void testSaveNull(){
+        userDto = null;
+        
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
+          
+        assertThrows(BadRequestException.class, () -> {
+            UserDTO result = instance.save(userDto);
+        });   
+        
+    }
+    
+    
+    @Test()
     public void testSaveUsernameEmpty() throws Exception{
         userDto = new UserDTO(null, null, "1223", "Cristian Gallego", "cgallego@gmail.com");
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
           
-        Exception eThrows = assertThrows(Exception.class, () -> {
+        Exception eThrows = assertThrows(BadRequestException.class, () -> {
             UserDTO result = instance.save(userDto);
         });   
         
@@ -91,7 +108,7 @@ public class UserServiceTest {
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
           
-        Exception eThrows = assertThrows(Exception.class, () -> {
+        Exception eThrows = assertThrows(BadRequestException.class, () -> {
             UserDTO result = instance.save(userDto);
         });   
         
@@ -103,12 +120,12 @@ public class UserServiceTest {
         userDto = new UserDTO(null, "cgallego", "1223", null, "cgallego@gmail.com");
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
-          
-        Exception eThrows = assertThrows(Exception.class, () -> {
+        
+        assertThrows(BadRequestException.class, () -> {
             UserDTO result = instance.save(userDto);
         });   
         
-        assertTrue(eThrows.getMessage().contains("Parametro name requerido"));
+        //assertTrue(eThrows.getMessage().contains("Parametro name requerido"));
     }
     
     @Test()
@@ -117,7 +134,7 @@ public class UserServiceTest {
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
           
-        Exception eThrows = assertThrows(Exception.class, () -> {
+        Exception eThrows = assertThrows(BadRequestException.class, () -> {
             UserDTO result = instance.save(userDto);
         });   
         
@@ -151,8 +168,6 @@ public class UserServiceTest {
         
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
         
-        //List<UserDTO> expected = new ArrayList<>();
-        
         List<UserDTO> result = instance.findAll();
         
         assertTrue(result.isEmpty());
@@ -176,40 +191,56 @@ public class UserServiceTest {
     }
     
     @Test
-    public void testFindOneIdNull() throws Exception{       
-        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
-        
-        Exception eThrows = assertThrows(Exception.class, () -> {
-            UserDTO result = instance.findOne(null);
+    public void testFindOneIdNull(){       
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);     
+        Long id = null;       
+        assertThrows(BadRequestException.class, () -> {
+            UserDTO result = instance.findOne(id);
         });
-        
-        assertTrue(eThrows.getMessage().contains("El id es necesario para consultar"));     
+             
     }
     
     @Test
-    public void testFindOneIsEmpty() throws Exception {       
+    public void testFindOneIsEmpty() {       
         UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
-        userEntity = new UserEntity();
-      
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(userEntity));
         
-        UserDTO expected = new UserDTO();
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
         
-        UserDTO result = instance.findOne(39L);
+        Long id = 39L; 
         
-        assertEquals(expected, result);
+        assertThrows(NotFoundException.class, () -> {
+            UserDTO u = instance.findOne(id);
+        });
+        
     }
     
-    
-    /*public void testDeleteOk(){
-        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
-        userEntity = new UserEntity(1L, "cgallego", "123", "Cristian Gallego", "cgallego202");
+    @Test
+    public void testDeleteOk(){
+        userEntity = new UserEntity(1L, "cgallego", "123", "Cristian Gallego", "cgallego202@gmail.com");
         
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(userEntity));
+        UserDTO expect = new UserDTO(1L, "cgallego", "123", "Cristian Gallego", "cgallego202@gmail.com");
+         
+        UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);
         
+        Long id = 1L;
+
+        doNothing().when(userRepository).deleteById(id);
         
+        UserDTO result = instance.delete(id);
         
-    }*/
+        assertEquals(expect, result);
+    }
+    
+    @Test
+    public void testDeleteIdNull(){
+      UserServiceImpl instance = new UserServiceImpl(userRepository, mapper);     
+        Long id = null;       
+        assertThrows(BadRequestException.class, () -> {
+            UserDTO result = instance.delete(id);
+        });
+    }
+    
     
     
     

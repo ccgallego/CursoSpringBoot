@@ -7,6 +7,8 @@ package co.edu.utp.isc.gia.restuser.service.impl;
 
 import co.edu.utp.isc.gia.restuser.data.entity.UserEntity;
 import co.edu.utp.isc.gia.restuser.data.repository.UserRepository;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
+import co.edu.utp.isc.gia.restuser.exceptions.responses.NotFoundException;
 import co.edu.utp.isc.gia.restuser.service.UserService;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.ArrayList;
@@ -32,17 +34,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO save(UserDTO user) throws Exception {
+    public UserDTO save(UserDTO user) {
         if (user == null) {
-            throw new Exception("Parametros no válidos");
+            throw new BadRequestException("Parametros no válidos");
         } else if (user.getUsername() == null || user.getUsername().isEmpty()) {
-            throw new Exception("Parametro username requerido");
+            throw new BadRequestException("Parametro username requerido");
         } else if (user.getName() == null || user.getName().isEmpty()) {
-            throw new Exception("Parametro name requerido");
+            throw new BadRequestException("Parametro name requerido");
         } else if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            throw new Exception("Parametro password requerido");
+            throw new BadRequestException("Parametro password requerido");
         } else if (user.getEmail()== null || user.getEmail().isEmpty()){
-            throw new Exception("Parametro email requerido");
+            throw new BadRequestException("Parametro email requerido");
         } 
         
         user.setUsername(user.getUsername().toLowerCase());
@@ -64,30 +66,52 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findOne(Long id) throws Exception {
+    public UserDTO findOne(Long id){
         if(id == null){
-            throw new Exception("El id es necesario para consultar");
+            throw new BadRequestException("El id es necesario para consultar");
         }
         Optional<UserEntity> opUser = this.userRepository.findById(id);
-        if (opUser.isPresent()) {
-            return mapper.map(opUser.get(), UserDTO.class);
-        } else {
-            return mapper.map(opUser.get(), UserDTO.class);
+        UserEntity u = opUser.orElseThrow(() -> new NotFoundException("No existe el usuario"));
+       
+        return mapper.map(u, UserDTO.class);
+           
+    }
+
+    @Override
+    public UserDTO delete(Long id){
+        if(id == null){
+            throw new BadRequestException("El id es necesario para consultar");
         }
+        Optional<UserEntity> opUser = this.userRepository.findById(id);
+        UserEntity u = opUser.orElseThrow(() -> new NotFoundException("No existe el usuario"));
+        this.userRepository.deleteById(id);
+        
+        return mapper.map(u, UserDTO.class);
         
     }
 
     @Override
-    public UserDTO delete(Long id) throws Exception {
-        if(id == null){
-            throw new Exception("El id es necesario para consultar");
+    public UserDTO update(Long id, UserDTO user) {
+        if(id == null || user == null){
+            throw new BadRequestException("Todos los parametros son necesarios");
+        } else if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            throw new BadRequestException("Parametro username requerido");
+        } else if (user.getName() == null || user.getName().isEmpty()) {
+            throw new BadRequestException("Parametro name requerido");
+        } else if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new BadRequestException("Parametro password requerido");
+        } else if (user.getEmail()== null || user.getEmail().isEmpty()){
+            throw new BadRequestException("Parametro email requerido");
         }
+        
         Optional<UserEntity> opUser = this.userRepository.findById(id);
-        if (opUser.isPresent()) {
-            this.userRepository.deleteById(id);
-            return mapper.map(opUser.get(), UserDTO.class);
-        }
-        return mapper.map(opUser.get(), UserDTO.class);
+        UserEntity u = opUser.orElseThrow(() -> new NotFoundException("No existe el usuario"));
+        
+        user.setId(u.getId());
+        user.setUsername(user.getUsername().toLowerCase());
+        UserEntity us = this.userRepository.save(mapper.map(user, UserEntity.class));
+        return mapper.map(us, UserDTO.class);
+        
     }
 
 }

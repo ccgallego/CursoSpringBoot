@@ -9,7 +9,6 @@ import co.edu.utp.isc.gia.restuser.exceptions.ExResponseEntityExceptionHandler;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.InternalServerErrorException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.NoContentException;
-import co.edu.utp.isc.gia.restuser.exceptions.responses.NotFoundException;
 import co.edu.utp.isc.gia.restuser.service.impl.UserServiceImpl;
 import co.edu.utp.isc.gia.restuser.web.dto.UserDTO;
 import java.util.List;
@@ -19,9 +18,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,12 +39,12 @@ public class UserController extends ExResponseEntityExceptionHandler {
     }
 
     @PostMapping()
-    public ResponseEntity<?> insert(@RequestBody UserDTO user){
+    public ResponseEntity<?> insert(@RequestBody UserDTO user) {
         //Valido
         if (user == null) {
-            throw new BadRequestException("Datos de usuario invalidos"); 
+            throw new BadRequestException("Datos de usuario invalidos");
             //ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Datos de usuario invalidos");     
-        } 
+        }
         //Ejecuto
         UserDTO u;
         try {
@@ -52,63 +52,52 @@ public class UserController extends ExResponseEntityExceptionHandler {
         } catch (Exception e) {
             throw new InternalServerErrorException("Error guardando al usuario, verificar los datos ingresados");
         }
-        
+
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
     }
 
     @GetMapping() //localhost:8080/user/
-    public ResponseEntity<?> getAll() throws Exception {
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDTO> getAll() throws Exception {
         List<UserDTO> list = userService.findAll();
         if (!list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(list);
+            return list;
         }
         throw new NoContentException("No hay datos disponibles");
     }
 
-    @GetMapping("/getOne") //localhost:8080/user/getOne?id=8
-    public ResponseEntity<UserDTO> getOne(@RequestParam("id") Long id) {
-        if(id == null){
+    @GetMapping("/{id}") //localhost:8080/user/getOne?id=8
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO getOne(@PathVariable("id") Long id) {
+        if (id == null) {
             throw new BadRequestException(("Debe ingresar el id del usuario a buscar"));
         }
-        UserDTO user;
-        try {
-            user = userService.findOne(id);
-        } catch (Exception e) {
-            throw new NotFoundException("No se encontraron resultados");
-        }
-        
-        return ResponseEntity.status(HttpStatus.OK).body(user);
-       
+        UserDTO user = userService.findOne(id);
+
+        return user;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDTO> deleteUser(@PathVariable("id") Long id) {
-        if(id == null){
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO deleteUser(@PathVariable("id") Long id) {
+        if (id == null) {
             throw new BadRequestException("Debe ingresar el id del usuario a eliminar");
         }
-        UserDTO user;
-        try {
-            user = userService.delete(id);
-        } catch (Exception e) {
-            throw new NoContentException("Error eliminando al usuario");
-        }
-        
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        UserDTO user = userService.delete(id);
+
+        return user;
     }
 
-    /*@PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long id, @RequestBody UserDTO user) {
-        UserDTO u = this.userService.findOne(id);
-        if (u == null) {
-            return ResponseEntity.notFound().build();
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO updateUser(@PathVariable("id") Long id, @RequestBody UserDTO user) {
+        if (id == null || user == null) {
+            throw new BadRequestException("Todos los parametros son necesarios");
         }
-        user.setId(u.getId());
-        u = this.userService.save(user);
+        UserDTO u = this.userService.update(id, user);
         if (u != null) {
-            return ResponseEntity.ok(user);
+            return u;
         }
-        return ResponseEntity.badRequest().build();
-    }*/
-    
-    
+        throw new InternalServerErrorException("Error actualizando el usuario");
+    }
 }

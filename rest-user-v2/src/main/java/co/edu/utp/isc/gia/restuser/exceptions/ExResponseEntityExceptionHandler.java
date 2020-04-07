@@ -6,11 +6,9 @@
 package co.edu.utp.isc.gia.restuser.exceptions;
 
 import co.edu.utp.isc.gia.restuser.exceptions.responses.BadRequestException;
-import co.edu.utp.isc.gia.restuser.exceptions.responses.FoundException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.InternalServerErrorException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.NoContentException;
 import co.edu.utp.isc.gia.restuser.exceptions.responses.NotFoundException;
-import co.edu.utp.isc.gia.restuser.exceptions.responses.OkSuccess;
 import java.util.Date;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,25 +40,12 @@ public class ExResponseEntityExceptionHandler extends ResponseEntityExceptionHan
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler(FoundException.class)
-    public final ResponseEntity<ResponseException> handleFoundException(FoundException ex, WebRequest request) {
-        ResponseException exceptionResponse = new ResponseException(new Date(), ex.getMessage(),
-                request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.FOUND);
-    }
 
     @ExceptionHandler(BadRequestException.class)
     public final ResponseEntity<ResponseException> handleBadRequestException(BadRequestException ex, WebRequest request) {
         ResponseException exceptionResponse = new ResponseException(new Date(), ex.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(OkSuccess.class)
-    public final ResponseEntity<ResponseException> handleOkException(OkSuccess ex, WebRequest request) {
-        ResponseException exceptionResponse = new ResponseException(new Date(), ex.getMessage(),
-                request.getDescription(false));
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.OK);
     }
     
     @ExceptionHandler(InternalServerErrorException.class)
